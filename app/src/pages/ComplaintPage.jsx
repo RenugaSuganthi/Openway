@@ -1,307 +1,764 @@
-import React, { useState } from "react";
-import { 
-  Bus, Train, Plane, Ship, MapPin, Phone, Mail, Shield, Users, Clock,
-  AlertCircle, Heart, GraduationCap, Stethoscope, ShoppingCart, Utensils,
-  HeadphonesIcon, ArrowRight, ChevronRight
-} from 'lucide-react';
-import Navbar from "@/components/Navbar";
-import { useLanguage } from '../context/LanguageContext';
+import React, { useState, useMemo } from "react";
+import {
+  AlertCircle,
+  Bus,
+  Clock,
+  User,
+  ShieldAlert,
+  Phone,
+  Mail,
+  Send,
+  FileText,
+  MapPin,
+  Sparkles,
+  ChevronRight,
+  ExternalLink,
+  MessageSquareWarning,
+  BadgeAlert,
+} from "lucide-react";
 
+import Navbar from "@/components/Navbar";
+import { useLanguage } from "../context/LanguageContext";
 
 const ComplaintPage = () => {
+  const { language } = useLanguage();
+
   const [formData, setFormData] = useState({
     name: "Renuga",
     email: "lakshitharenuga@gmail.com",
     phone: "",
     complaintType: "busDelay",
+
     busNumber: "",
     route: "",
-    details: ""
+    details: "",
+
+    delayDuration: "",
+    expectedTime: "",
+
+    staffName: "",
+    behaviorDetails: "",
+
+    incidentLocation: "",
+    safetyIssue: "",
+
+    ticketNumber: "",
+    travelDate: "",
   });
-  const { t, language, toggleLanguage } = useLanguage();
+
+  const [loading, setLoading] = useState(false);
   const [aiEmail, setAiEmail] = useState("");
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const complaintTypeTamil = {
-    busDelay: "பேருந்து தாமதம்",
-    overcrowding: "கூடுதல் மக்கள்",
-    infrastructure: "அமைப்புச் சிக்கல்",
-    behavior: "நடத்தை சிக்கல்",
-    other: "மற்றவை"
+  const complaintTypes = {
+    busDelay: {
+      labelEN: "Bus Delay",
+      labelTA: "பேருந்து தாமதம்",
+      icon: Clock,
+      color: "from-orange-500 to-red-500",
+    },
+
+    overcrowding: {
+      labelEN: "Overcrowding",
+      labelTA: "அதிக நெரிசல்",
+      icon: UsersIcon,
+      color: "from-pink-500 to-rose-500",
+    },
+
+    behavior: {
+      labelEN: "Staff Behavior",
+      labelTA: "ஊழியர் நடத்தை",
+      icon: User,
+      color: "from-purple-500 to-indigo-500",
+    },
+
+    womenSafety: {
+      labelEN: "Women Safety",
+      labelTA: "பெண்கள் பாதுகாப்பு",
+      icon: ShieldAlert,
+      color: "from-red-500 to-pink-500",
+    },
+
+    infrastructure: {
+      labelEN: "Infrastructure",
+      labelTA: "அமைப்பு சிக்கல்",
+      icon: Bus,
+      color: "from-blue-500 to-cyan-500",
+    },
+
+    ticketIssue: {
+      labelEN: "Ticket Issue",
+      labelTA: "டிக்கெட் சிக்கல்",
+      icon: FileText,
+      color: "from-green-500 to-emerald-500",
+    },
+
+    other: {
+      labelEN: "Other",
+      labelTA: "மற்றவை",
+      icon: MessageSquareWarning,
+      color: "from-gray-500 to-slate-600",
+    },
   };
 
-  const officerEmails = {
-    busDelay: "commercial@tnstc.org",
-    overcrowding: "cmcell@tn.gov.in",
-    infrastructure: "tnstcbemd@gmail.com",
-    behavior: "cmcell@tn.gov.in",
-    other: "commercial@tnstc.org"
-  };
+  const officerData = {
+  busDelay: {
+    title: "Bus Delay & Operational Issues",
+    email: "ptcsotrs@gmail.com",
+    phone: "18005991500",
+    tollFree: "149",
+    whatsapp: "9445014448",
+    website: "https://tnstc.in",
+  },
+
+  overcrowding: {
+    title: "Bus Overcrowding & Route Frequency",
+    email: "cmcell@tn.gov.in",
+    phone: "1100",
+    tollFree: "1100",
+    whatsapp: "",
+    website: "https://tnega.org",
+  },
+
+  behavior: {
+    title: "Staff Behavior & Public Nuisance",
+    email: "commercial@tnstc.org",
+    phone: "18005991500", // Fixed missing 5 typo
+    tollFree: "149",
+    whatsapp: "9445014448",
+    website: "https://tn.gov.in",
+  },
+
+  womenSafety: {
+    title: "Women Safety & Security Emergencies",
+    email: "cmcell@tn.gov.in",
+    phone: "112", // Pan-India Emergency line
+    tollFree: "1091", // State Women Helpline
+    whatsapp: "",
+    website: "https://ncw.gov.in",
+  },
+
+  infrastructure: {
+    title: "Bus Stand, Depot & Infrastructure Facilities",
+    email: "transport@tn.gov.in",
+    phone: "04428520682",
+    tollFree: "",
+    whatsapp: "",
+    website: "https://tn.gov.in",
+  },
+
+  ticketIssue: {
+    title: "Ticket Booking & Refund Failures",
+    email: "commercial@tnstc.org",
+    phone: "9513948001", // Direct OTRS reservation support
+    tollFree: "149",
+    whatsapp: "9445014448",
+    website: "https://tnstc.in",
+  },
+
+  other: {
+    title: "Other Unresolved Grievances",
+    email: "cmcell@tn.gov.in",
+    phone: "1100",
+    tollFree: "1100",
+    whatsapp: "",
+    website: "https://tnega.org",
+  },
+};
+
+
+  const currentOfficer = useMemo(() => {
+    return officerData[formData.complaintType];
+  }, [formData.complaintType]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
-  const getOfficerEmail = (type) => {
-    return officerEmails[type] || "support.tnstc@tn.gov.in";
-  };
-
-  const handlePreviewEmail = () => {
-    const officerEmail = getOfficerEmail(formData.complaintType);
+  const generateEmailTemplate = () => {
     const date = new Date().toLocaleDateString();
-    const complaintLabelTA = complaintTypeTamil[formData.complaintType];
 
-    // English Email
-    const emailContentEN = `
-Subject: Complaint Regarding ${formData.complaintType}
+    const type =
+      language === "tamil"
+        ? complaintTypes[formData.complaintType].labelTA
+        : complaintTypes[formData.complaintType].labelEN;
 
-Dear Officer,
+    let template = "";
 
-I would like to report an issue regarding Tamil Nadu State Transport Corporation services.
+    switch (formData.complaintType) {
+      case "busDelay":
+        template = `
+Subject: Complaint Regarding Bus Delay
+
+Respected Sir/Madam,
+
+I would like to report a delay in TNSTC bus services.
+
+Bus Number: ${formData.busNumber}
+Route: ${formData.route}
+Expected Time: ${formData.expectedTime}
+Delay Duration: ${formData.delayDuration}
+Date: ${date}
+
+The delay caused inconvenience to passengers. Kindly investigate and take necessary action.
 
 Complaint Details:
-• Type: ${formData.complaintType}
-• Bus Number: ${formData.busNumber || "Not specified"}
-• Route: ${formData.route || "Not specified"}
-• Date of Incident: ${date}
-
-Description:
-I experienced a problem related to ${formData.complaintType}. The bus service on the route ${formData.route} caused inconvenience to passengers. I kindly request the department to investigate this issue and take necessary action.
 ${formData.details}
 
-I request immediate attention and resolution for this matter.
-Thank you for your attention.
 Sincerely,
 ${formData.name}
-Phone: ${formData.phone || "N/A"}
+Phone: ${formData.phone}
 Email: ${formData.email}
 
----
-Sent via OpenWay Portal
-To: ${officerEmail}
+To:
+${currentOfficer.email}
 `;
+        break;
 
-    // Tamil Email
-    const emailContentTA = `
-பொருள்: ${complaintLabelTA} குறித்த புகார்
+      case "behavior":
+        template = `
+Subject: Complaint Against Staff Behavior
 
-அன்பார்ந்த அதிகாரி அவர்களுக்கு,
+Respected Officer,
 
-தமிழ்நாடு அரசு போக்குவரத்து கழக சேவையில் ஏற்பட்ட சிக்கலை உங்கள் கவனத்திற்கு கொண்டு வருகிறேன்.
+I would like to report inappropriate behavior by transport staff.
 
-புகார் விவரங்கள்:
-• வகை: ${complaintLabelTA}
-• பேருந்து எண்: ${formData.busNumber || "குறிப்பிடப்படவில்லை"}
-• வழி: ${formData.route || "குறிப்பிடப்படவில்லை"}
-• நிகழ்வு தேதி: ${date}
+Staff Name: ${formData.staffName}
+Bus Number: ${formData.busNumber}
+Route: ${formData.route}
+Date: ${date}
 
-விளக்கம்:
+Issue:
+${formData.behaviorDetails}
 
-நான் ${complaintLabelTA} தொடர்பான சிக்கலை அனுபவித்தேன். ${formData.route} வழியில் பேருந்து சேவை காரணமாக பயணிகளுக்கு சிக்கல் ஏற்பட்டது. தயவுசெய்து இந்த விஷயத்தை ஆராய்ந்து, தேவையான நடவடிக்கை எடுக்குமாறு கோருகிறேன்.
+Additional Details:
 ${formData.details}
 
-இந்த விஷயத்திற்கு உடனடியாக கவனம் செலுத்தி தீர்வு காணுமாறு கோருகிறேன்.
+Please take disciplinary action.
 
-மிகவும் அன்புடன்,
+Regards,
 ${formData.name}
-தொலைபேசி: ${formData.phone || "தகவல் இல்லை"}
-மின்னஞ்சல்: ${formData.email}
 
----
-OpenWay போர்டல் மூலம் அனுப்பப்பட்டது
-To: ${officerEmail}
+To:
+${currentOfficer.email}
 `;
+        break;
 
-    setAiEmail(language === "tamil" ? emailContentTA : emailContentEN);
+      case "womenSafety":
+        template = `
+Subject: Women Safety Complaint
+
+Dear Sir/Madam,
+
+I wish to report a women safety concern during bus travel.
+
+Location: ${formData.incidentLocation}
+Bus Number: ${formData.busNumber}
+Route: ${formData.route}
+
+Issue:
+${formData.safetyIssue}
+
+Additional Details:
+${formData.details}
+
+Kindly take immediate action.
+
+Regards,
+${formData.name}
+
+To:
+${currentOfficer.email}
+`;
+        break;
+
+      default:
+        template = `
+Subject: Transport Complaint
+
+Respected Officer,
+
+I would like to raise a complaint regarding transport services.
+
+Complaint Type: ${type}
+Bus Number: ${formData.busNumber}
+Route: ${formData.route}
+
+Details:
+${formData.details}
+
+Kindly resolve the issue.
+
+Regards,
+${formData.name}
+
+To:
+${currentOfficer.email}
+`;
+    }
+
+    setAiEmail(template);
   };
 
   const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-    const response = await fetch("http://localhost:8082/complaints", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(formData)
-    });
+    setLoading(true);
 
-    const data = await response.json();
-
-    alert(
-      language === "english"
-        ? "Complaint submitted successfully!"
-        : "புகார் வெற்றிகரமாக சமர்ப்பிக்கப்பட்டது!"
+    // Save complaint in database
+    const response = await fetch(
+      "http://localhost:8082/complaints",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      }
     );
 
-    console.log("Saved Complaint:", data);
+    if (!response.ok) {
+      throw new Error("Failed to save complaint");
+    }
+
+    // Generate email content
+    const officer = officerData[formData.complaintType];
+
+    const subject = encodeURIComponent(
+      `Transport Complaint - ${formData.complaintType}`
+    );
+
+    const body = encodeURIComponent(`
+Name: ${formData.name}
+
+Phone: ${formData.phone}
+
+Bus Number: ${formData.busNumber}
+
+Route: ${formData.route}
+
+Complaint Details:
+${formData.details}
+    `);
+
+    // Open default mail app
+    window.location.href = `mailto:${officer.email}?subject=${subject}&body=${body}`;
+
+    alert("Complaint submitted successfully!");
+
+    setLoading(false);
 
   } catch (error) {
-    console.error("Error:", error);
+    console.error(error);
+
+    setLoading(false);
+
     alert("Error submitting complaint");
   }
 };
 
+  const ActiveIcon =
+    complaintTypes[formData.complaintType].icon;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50">
-      {/* Navbar */}
-      <Navbar/>
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 overflow-hidden">
+      <Navbar />
 
-      {/* Main Form */}
-      <div className="pt-24 pb-12 px-4 max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl mb-4">
-            <AlertCircle className="w-8 h-8 text-white" />
+      {/* Floating Background */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-orange-200 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-red-200 rounded-full blur-3xl opacity-20 animate-pulse"></div>
+      </div>
+
+      <div className="relative z-10 pt-28 pb-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Hero */}
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-3 bg-white shadow-lg rounded-full px-6 py-3 mb-6 animate-bounce">
+              <Sparkles className="text-orange-500" />
+              <span className="font-semibold">
+                {language === "tamil"
+                  ? "தமிழ்நாடு போக்குவரத்து புகார் மையம்"
+                  : "Tamil Nadu Transport Complaint Portal"}
+              </span>
+            </div>
+
+            <h1 className="text-5xl font-black bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+              {language === "tamil"
+                ? "புகார் பதிவு"
+                : "File Complaint"}
+            </h1>
+
+            <p className="text-gray-600 mt-4 text-lg">
+              {language === "tamil"
+                ? "உங்கள் பிரச்சனையை நேரடியாக அதிகாரிகளுக்கு தெரிவிக்கவும்"
+                : "Raise your transport issue directly to TN officials"}
+            </p>
           </div>
-          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
-            {language === "tamil" ? "புகார் சமர்ப்பிக்கவும்" : "File a Complaint"}
-          </h1>
-          <p className="text-gray-600">
-            {language === "tamil" ? "உங்கள் புகார்களை நேரடியாக அதிகாரிகளுக்கு அனுப்பவும்" : "Send your complaints directly to officials"}
-          </p>
-        </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-xl p-6 lg:p-8">
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {language === "tamil" ? "உங்கள் பெயர் *" : "Your Name *"}
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder={language === "tamil" ? "உங்கள் பெயர்" : "Your name"}
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-              />
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* LEFT PANEL */}
+            <div className="lg:col-span-1 space-y-6">
+              {/* Complaint Type Cards */}
+              <div className="bg-white rounded-3xl p-6 shadow-xl">
+                <h2 className="font-bold text-xl mb-5">
+                  Complaint Categories
+                </h2>
+
+                <div className="space-y-4">
+                  {Object.entries(complaintTypes).map(
+                    ([key, item]) => {
+                      const Icon = item.icon;
+
+                      return (
+                        <button
+                          key={key}
+                          onClick={() =>
+                            setFormData({
+                              ...formData,
+                              complaintType: key,
+                            })
+                          }
+                          className={`w-full p-4 rounded-2xl transition-all duration-300 border-2 group hover:scale-105 ${
+                            formData.complaintType === key
+                              ? "border-orange-500 bg-orange-50 shadow-lg"
+                              : "border-transparent bg-gray-50 hover:bg-white"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div
+                                className={`w-12 h-12 rounded-xl bg-gradient-to-r ${item.color} flex items-center justify-center text-white`}
+                              >
+                                <Icon size={22} />
+                              </div>
+
+                              <div className="text-left">
+                                <p className="font-semibold">
+                                  {language === "tamil"
+                                    ? item.labelTA
+                                    : item.labelEN}
+                                </p>
+                              </div>
+                            </div>
+
+                            <ChevronRight className="group-hover:translate-x-1 transition-all" />
+                          </div>
+                        </button>
+                      );
+                    }
+                  )}
+                </div>
+              </div>
+
+              {/* Official Contact Card */}
+              <div className="bg-gradient-to-br from-orange-500 to-red-500 text-white rounded-3xl p-6 shadow-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <BadgeAlert />
+                  <h2 className="font-bold text-xl">
+                    Official Contact
+                  </h2>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex gap-3">
+                    <Mail />
+                    <span>{currentOfficer.email}</span>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Phone />
+                    <span>{currentOfficer.phone}</span>
+                  </div>
+
+                  <a
+                    href={currentOfficer.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 bg-white text-orange-600 px-4 py-3 rounded-xl font-semibold hover:scale-105 transition-all"
+                  >
+                    Visit Official Website
+                    <ExternalLink size={18} />
+                  </a>
+                </div>
+              </div>
             </div>
 
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email *
-              </label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="email@example.com"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-              />
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {language === "tamil" ? "தொலைபேசி எண்" : "Phone Number"}
-              </label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                placeholder="+91 98765 43210"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-              />
-            </div>
-
-            {/* Complaint Type */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {language === "tamil" ? "புகார் வகை *" : "Complaint Type *"}
-              </label>
-              <select
-                name="complaintType"
-                value={formData.complaintType}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+            {/* FORM */}
+            <div className="lg:col-span-2">
+              <form
+                onSubmit={handleSubmit}
+                className="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl p-8"
               >
-                {Object.keys(complaintTypeTamil).map((type) => (
-                  <option key={type} value={type}>
-                    {language === "tamil" ? complaintTypeTamil[type] : type}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {/* HEADER */}
+                <div className="flex items-center gap-4 mb-8">
+                  <div
+                    className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${
+                      complaintTypes[
+                        formData.complaintType
+                      ].color
+                    } flex items-center justify-center text-white shadow-lg`}
+                  >
+                    <ActiveIcon size={30} />
+                  </div>
 
-            {/* Bus Number */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {language === "tamil" ? "பேருந்து எண்" : "Bus Number"}
-              </label>
-              <input
-                type="text"
-                name="busNumber"
-                value={formData.busNumber}
-                onChange={handleChange}
-                placeholder="TN-01-AB-1234"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-              />
-            </div>
+                  <div>
+                    <h2 className="text-2xl font-bold">
+                      {language === "tamil"
+                        ? complaintTypes[
+                            formData.complaintType
+                          ].labelTA
+                        : complaintTypes[
+                            formData.complaintType
+                          ].labelEN}
+                    </h2>
 
-            {/* Route */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {language === "tamil" ? "வழி" : "Route"}
-              </label>
-              <input
-                type="text"
-                name="route"
-                value={formData.route}
-                onChange={handleChange}
-                placeholder={language === "tamil" ? "சென்னை - கோயம்புத்தூர்" : "Chennai - Coimbatore"}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
-              />
+                    <p className="text-gray-500">
+                      Fill all details properly
+                    </p>
+                  </div>
+                </div>
+
+                {/* BASIC */}
+                <div className="grid md:grid-cols-2 gap-5">
+                  <InputField
+                    icon={User}
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Full Name"
+                  />
+
+                  <InputField
+                    icon={Mail}
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Email Address"
+                  />
+
+                  <InputField
+                    icon={Phone}
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Phone Number"
+                  />
+
+                  <InputField
+                    icon={Bus}
+                    name="busNumber"
+                    value={formData.busNumber}
+                    onChange={handleChange}
+                    placeholder="Bus Number"
+                  />
+
+                  <InputField
+                    icon={MapPin}
+                    name="route"
+                    value={formData.route}
+                    onChange={handleChange}
+                    placeholder="Route"
+                  />
+                </div>
+
+                {/* Dynamic Fields */}
+                <div className="mt-6 space-y-5">
+                  {formData.complaintType ===
+                    "busDelay" && (
+                    <div className="grid md:grid-cols-2 gap-5 animate-fadeIn">
+                      <InputField
+                        icon={Clock}
+                        name="expectedTime"
+                        value={formData.expectedTime}
+                        onChange={handleChange}
+                        placeholder="Expected Arrival Time"
+                      />
+
+                      <InputField
+                        icon={Clock}
+                        name="delayDuration"
+                        value={formData.delayDuration}
+                        onChange={handleChange}
+                        placeholder="Delay Duration"
+                      />
+                    </div>
+                  )}
+
+                  {formData.complaintType ===
+                    "behavior" && (
+                    <div className="animate-fadeIn">
+                      <InputField
+                        icon={User}
+                        name="staffName"
+                        value={formData.staffName}
+                        onChange={handleChange}
+                        placeholder="Driver / Conductor Name"
+                      />
+
+                      <textarea
+                        name="behaviorDetails"
+                        value={
+                          formData.behaviorDetails
+                        }
+                        onChange={handleChange}
+                        placeholder="Explain staff behavior issue..."
+                        className="w-full mt-4 p-4 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-orange-100 outline-none"
+                        rows={4}
+                      />
+                    </div>
+                  )}
+
+                  {formData.complaintType ===
+                    "womenSafety" && (
+                    <div className="animate-fadeIn">
+                      <InputField
+                        icon={MapPin}
+                        name="incidentLocation"
+                        value={
+                          formData.incidentLocation
+                        }
+                        onChange={handleChange}
+                        placeholder="Incident Location"
+                      />
+
+                      <textarea
+                        name="safetyIssue"
+                        value={formData.safetyIssue}
+                        onChange={handleChange}
+                        placeholder="Describe safety issue..."
+                        className="w-full mt-4 p-4 rounded-2xl border border-gray-200 focus:ring-4 focus:ring-red-100 outline-none"
+                        rows={4}
+                      />
+                    </div>
+                  )}
+
+                  {formData.complaintType ===
+                    "ticketIssue" && (
+                    <div className="grid md:grid-cols-2 gap-5 animate-fadeIn">
+                      <InputField
+                        icon={FileText}
+                        name="ticketNumber"
+                        value={formData.ticketNumber}
+                        onChange={handleChange}
+                        placeholder="Ticket Number"
+                      />
+
+                      <InputField
+                        icon={Clock}
+                        name="travelDate"
+                        value={formData.travelDate}
+                        onChange={handleChange}
+                        placeholder="Travel Date"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* COMMON DETAILS */}
+                <div className="mt-6">
+                  <textarea
+                    name="details"
+                    value={formData.details}
+                    onChange={handleChange}
+                    rows={6}
+                    placeholder="Describe complaint in detail..."
+                    className="w-full p-5 rounded-3xl border border-gray-200 focus:ring-4 focus:ring-orange-100 outline-none transition-all"
+                  />
+                </div>
+
+                {/* BUTTONS */}
+                <div className="flex flex-col md:flex-row gap-4 mt-8">
+                  <button
+                    type="button"
+                    onClick={generateEmailTemplate}
+                    className="flex-1 bg-gradient-to-r from-purple-500 to-indigo-600 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-lg"
+                  >
+                    <Sparkles />
+                    Generate AI Email
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 bg-gradient-to-r from-orange-500 to-red-500 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-lg"
+                  >
+                    <Send />
+                    {loading
+                      ? "Submitting..."
+                      : "Submit Complaint"}
+                  </button>
+                </div>
+
+                {/* AI EMAIL */}
+                {aiEmail && (
+                  <div className="mt-8 bg-gray-900 text-green-400 rounded-3xl p-6 shadow-2xl animate-fadeIn">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Sparkles />
+                      <h3 className="font-bold text-lg">
+                        AI Generated Official Email
+                      </h3>
+                    </div>
+
+                    <pre className="whitespace-pre-wrap text-sm overflow-auto max-h-96">
+                      {aiEmail}
+                    </pre>
+                  </div>
+                )}
+              </form>
             </div>
           </div>
-
-          {/* Details */}
-          <div className="mt-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              {language === "tamil" ? "புகார் விவரங்கள் *" : "Complaint Details *"}
-            </label>
-            <textarea
-              name="details"
-              value={formData.details}
-              onChange={handleChange}
-              rows="5"
-              required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all resize-none"
-              placeholder={language === "tamil" ? "உங்கள் புகாரை விரிவாக குறிப்பிடவும்..." : "Describe your complaint in detail..."}
-            ></textarea>
-          </div>
-
-          {/* AI Preview Button */}
-          <button type="button" onClick={handlePreviewEmail} className="w-full mt-4 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold hover:shadow-lg transition-all flex items-center justify-center space-x-2">
-            {language === "tamil" ? "AI மின்னஞ்சல் முன்விபரிப்பு" : "Preview AI Email"}
-          </button>
-
-          {/* AI Email Display */}
-          {aiEmail && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-200">
-              <p className="text-sm font-medium text-gray-700 mb-2">
-                {language === "tamil" ? "AI உருவாக்கிய மின்னஞ்சல்:" : "AI-Generated Email:"}
-              </p>
-              <pre className="text-sm text-gray-700 whitespace-pre-wrap font-mono max-h-40 overflow-y-auto">{aiEmail}</pre>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <div className="mt-6">
-            <button type="submit" className="w-full py-4 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center space-x-2">
-              {language === "tamil" ? "புகார் சமர்ப்பிக்கவும்" : "Submit Complaint"}
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
+  );
+};
+
+const InputField = ({
+  icon: Icon,
+  placeholder,
+  name,
+  value,
+  onChange,
+}) => {
+  return (
+    <div className="relative group">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-orange-500 transition-all">
+        <Icon size={20} />
+      </div>
+
+      <input
+        type="text"
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-4 focus:ring-orange-100 outline-none transition-all"
+      />
+    </div>
+  );
+};
+
+const UsersIcon = ({ size = 22 }) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
   );
 };
 
