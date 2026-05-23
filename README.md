@@ -1,7 +1,15 @@
-# OpenWay Website
+# Openway
 
-## Frontend
-ReactJS application
+## Tech Stack
+- ReactJS
+- Spring Boot
+- MySQL
 
-## Backend
-Spring Boot API
+## Run Frontend
+cd app
+npm install
+npm run dev
+
+## Run Backend
+cd backend
+mvn spring-boot:run
