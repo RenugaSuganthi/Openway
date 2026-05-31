@@ -37,25 +37,26 @@
 ## 🏗️ Architecture
 
 ```
-openway/
-├── frontend/                  # React.js Application
+Openway/
+├── app/                           # React.js Frontend Application
 │   ├── src/
-│   │   ├── components/        # Reusable UI components
-│   │   ├── pages/             # Route/page-level components
-│   │   ├── services/          # API call functions (axios)
-│   │   └── App.jsx            # Root component + routing
-│   └── tailwind.config.js
+│   │   ├── components/            # Reusable UI components
+│   │   ├── pages/                 # Route/page-level components
+│   │   ├── services/              # API call functions (axios)
+│   │   └── App.jsx                # Root component + routing
+│   ├── tailwind.config.js
+│   └── package.json
 │
-├── backend/                   # Spring Boot Application
+├── openway backend/               # Spring Boot Backend Application
 │   └── src/main/java/
-│       ├── controller/        # REST Controllers (10+ endpoints)
-│       ├── service/           # Business logic layer
-│       ├── repository/        # JPA Repositories (MySQL)
-│       ├── model/             # Entity classes
+│       ├── controller/            # REST Controllers (10+ endpoints)
+│       ├── service/               # Business logic layer
+│       ├── repository/            # JPA Repositories (MySQL)
+│       ├── model/                 # Entity classes
 │       └── OpenWayApplication.java
 │
 └── database/
-    └── schema.sql             # Normalised MySQL schema
+    └── schema.sql                 # Normalised MySQL schema
 ```
 
 ---
@@ -102,7 +103,7 @@ openway/
 ```bash
 # Clone the repository
 git clone https://github.com/RenugaSuganthi/Openway.git
-cd Openway/backend
+cd "Openway/openway backend"
 
 # Configure MySQL in application.properties
 spring.datasource.url=jdbc:mysql://localhost:3306/openway_db
@@ -115,7 +116,7 @@ mvn spring-boot:run
 
 ### Frontend Setup
 ```bash
-cd Openway/frontend
+cd Openway/app
 
 # Install dependencies
 npm install
