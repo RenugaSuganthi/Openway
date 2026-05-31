@@ -1,4 +1,4 @@
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=160&section=header&text=Openway&fontSize=40&fontColor=fff&animation=twinkling&fontAlignY=35&desc=Smart+Public+Transport+%26+Social+Assistance+System&descAlignY=60&descSize=16" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=wave&amp;color=0:1a1a2e,100:16213e&amp;height=160&amp;section=header&amp;text=Openway&amp;fontSize=40&amp;fontColor=fff&amp;animation=fadeIn&amp;fontAlignY=35&amp;desc=Smart+Public+Transport+and+Social+Assistance+System&amp;descAlignY=60&amp;descSize=16&amp;descColor=70a5fd" width="100%"/>
 
 <div align="center">
 
@@ -161,4 +161,4 @@ The app will be running at `http://localhost:5173` (frontend) and `http://localh
 📧 lakshitharenuga@gmail.com  
 🔗 [LinkedIn](https://linkedin.com/in/renuga-k-a847b828b) · [GitHub](https://github.com/RenugaSuganthi)
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=gradient&customColorList=6,11,20&height=100&section=footer&animation=twinkling" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=wave&amp;color=0:1a1a2e,100:16213e&amp;height=100&amp;section=footer&amp;animation=fadeIn" width="100%"/>
