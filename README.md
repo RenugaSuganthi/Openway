@@ -1,4 +1,4 @@
-<img src="https://capsule-render.vercel.app/api?type=wave&amp;color=0:1a1a2e,100:16213e&amp;height=160&amp;section=header&amp;text=Openway&amp;fontSize=40&amp;fontColor=fff&amp;animation=fadeIn&amp;fontAlignY=35&amp;desc=Smart+Public+Transport+and+Social+Assistance+System&amp;descAlignY=60&amp;descSize=16&amp;descColor=70a5fd" width="100%"/>
+<img src="https://capsule-render.vercel.app/api?type=wave&amp;color=0:1a1a2e,100:16213e&amp;height=200&amp;section=header&amp;text=Openway&amp;fontSize=50&amp;fontColor=fff&amp;animation=twinkling&amp;fontAlignY=40&amp;desc=Smart+Public+Transport+and+Social+Assistance+System&amp;descAlignY=60&amp;descSize=18&amp;descColor=70a5fd" width="100%"/>
 
 <div align="center">
 
